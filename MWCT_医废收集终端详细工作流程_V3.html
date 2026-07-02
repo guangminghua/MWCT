@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能挂秤医废收集终端（MWCT）详细工作流程</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --accent: #2b6cb0;
+            --dark: #2d3748;
+            --muted: #718096;
+            --light-bg: #f7fafc;
+            --border: #e2e8f0;
+            --green-bg: #f0fff4;
+            --green-border: #c6f6d5;
+            --green-text: #276749;
+            --step-bg: #ebf8ff;
+            --step-border: #90cdf4;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--dark);
+            background: #f0f2f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        /* ===== Cover ===== */
+        .cover {
+            background: linear-gradient(135deg, var(--primary) 0%, #2c5282 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+            border-radius: 0 0 24px 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(26, 54, 93, 0.2);
+        }
+
+        .cover .logo-text {
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            opacity: 0.7;
+            margin-bottom: 24px;
+        }
+
+        .cover h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .cover h2 {
+            font-size: 1.4rem;
+            font-weight: 400;
+            opacity: 0.85;
+            margin-bottom: 8px;
+        }
+
+        .cover .mwct {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            opacity: 0.9;
+            margin: 16px 0;
+            padding: 8px 24px;
+            border: 2px solid rgba(255,255,255,0.4);
+            display: inline-block;
+            border-radius: 4px;
+        }
+
+        .cover .info-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .cover .info-item {
+            background: rgba(255,255,255,0.12);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .cover .info-item span {
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .cover .version {
+            margin-top: 24px;
+            font-size: 0.85rem;
+            opacity: 0.5;
+        }
+
+        /* ===== Section ===== */
+        .section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px 36px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section h2 .num {
+            background: var(--accent);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .section p {
+            color: var(--dark);
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        /* ===== Flow Overview ===== */
+        .role-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            background: var(--light-bg);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .role-legend .title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .role-legend .tag {
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        .role-legend .tag.blue { background: var(--accent); }
+        .role-legend .tag.green { background: var(--green-text); }
+        .role-legend .tag.dark { background: var(--dark); }
+
+        .flow-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .flow-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--light-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .flow-item:hover {
+            border-left-color: var(--accent);
+            background: var(--step-bg);
+        }
+
+        .flow-item .step-num {
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .flow-item .step-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .flow-item .step-role {
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            border-radius: 4px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .flow-item .step-role.blue { background: var(--accent); }
+        .flow-item .step-role.green { background: var(--green-text); }
+        .flow-item .step-role.dark { background: var(--dark); }
+
+        /* ===== Step Card ===== */
+        .step-card {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--step-border);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            gap: 12px;
+        }
+
+        .step-header.blue { background: var(--accent); }
+        .step-header.green { background: var(--green-text); }
+        .step-header.dark { background: var(--dark); }
+
+        .step-header .step-title {
+            flex: 1;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .step-header .step-badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            font-size: 0.82rem;
+        }
+
+        .step-body {
+            padding: 20px 24px;
+            background: var(--white);
+        }
+
+        .step-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            align-items: flex-start;
+        }
+
+        .step-item:last-child { margin-bottom: 0; }
+
+        .step-item .bullet {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .step-item p {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .step-note {
+            background: var(--green-bg);
+            border-left: 4px solid var(--green-border);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--green-text);
+        }
+
+        .step-image {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .step-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .image-caption {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* ===== Table ===== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: var(--accent);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .data-table tr:nth-child(even) td { background: var(--light-bg); }
+        .data-table tr:hover td { background: #edf2f7; }
+
+        /* ===== Diff Table ===== */
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            margin-top: 8px;
+        }
+
+        .diff-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .diff-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .diff-table tr:nth-child(even) td { background: var(--light-bg); }
+
+        .diff-table td:first-child {
+            font-weight: 600;
+            color: var(--primary);
+            width: 160px;
+        }
+
+        .diff-highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* ===== Footer ===== */
+        .page-footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .cover h1 { font-size: 1.8rem; }
+            .cover .info-row { flex-direction: column; gap: 12px; }
+            .section { padding: 20px; }
+            .step-body { padding: 16px; }
+            .role-legend { flex-direction: column; gap: 8px; }
+            .diff-table, .data-table { font-size: 0.82rem; }
+            .diff-table td:first-child { width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Cover -->
+    <div class="cover">
+        <div class="logo-text">MEDICAL WASTE COLLECTION TERMINAL</div>
+        <h1>智能挂秤医废收集终端</h1>
+        <div class="mwct">MWCT</div>
+        <h2>详细工作流程</h2>
+        <div class="info-row">
+            <div class="info-item">
+                <div>适用场景</div>
+                <span>基层小微医疗机构（诊所、卫生室等）</span>
+            </div>
+            <div class="info-item">
+                <div>后台平台</div>
+                <span>晋卫通医废监管系统</span>
+            </div>
+        </div>
+        <div class="version">版本 V3.0 &nbsp;</div>
+    </div>
+
+    <!-- 一、场景概述 -->
+    <div class="section">
+        <h2><span class="num">一</span>场景概述</h2>
+        <p>MWCT（智能挂秤医废收集终端）是一款自带称重模块的一体化设备，主要面向基层小微医疗机构，如社区诊所、村镇卫生室等。此类机构医废产生量少，但同样需要纳入规范监管。</p>
+        <p>MWCT内置扫码模块和称重传感器，工作人员通过扫描预先下发的医废类型二维码实现废物分类识别，无需手动选择，操作流程简洁高效。数据实时上报至晋卫通后台处置中心，由后台自动规划收运路线，安排司机完成交接和收运。</p>
+    </div>
+
+    <!-- 二、流程总览 -->
+    <div class="section">
+        <h2><span class="num">二</span>流程总览</h2>
+
+        <div class="role-legend">
+            <span class="title">角色图例：</span>
+            <span class="tag blue">■ 诊所工作人员</span>
+            <span class="tag green">■ 收运司机</span>
+            <span class="tag dark">■ 后台系统</span>
+        </div>
+
+        <div class="flow-list">
+            <div class="flow-item">
+                <div class="step-num">1</div>
+                <div class="step-text">开机登录，绑定医疗机构</div>
+                <div class="step-role blue">诊所工作人员</div>
+            </div>
+            <div class="flow-item">
+                <div class="step-num">2</div>
+                <div class="step-text">扫描预下发二维码，识别废物类型</div>
+                <div class="step-role blue">诊所工作人员</div>
+            </div>
+            <div class="flow-item">
+                <div class="step-num">3</div>
+                <div class="step-text">称重</div>
+                <div class="step-role blue">诊所工作人员</div>
+            </div>
+            <div class="flow-item">
+                <div class="step-num">4</div>
+                <div class="step-text">确认绑定并上报晋卫通后台</div>
+                <div class="step-role blue">诊所工作人员</div>
+            </div>
+            <div class="flow-item">
+                <div class="step-num">5</div>
+                <div class="step-text">后台接收提报，自动规划收运路线</div>
+                <div class="step-role dark">后台系统</div>
+            </div>
+            <div class="flow-item">
+                <div class="step-num">6</div>
+                <div class="step-text">司机到场，双方交接确认</div>
+                <div class="step-role green">收运司机</div>
+            </div>
+            <div class="flow-item">
+                <div class="step-num">7</div>
+                <div class="step-text">司机RFID周转箱绑定，完成收运</div>
+                <div class="step-role green">收运司机</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 三、详细工作流程 -->
+    <div class="section">
+        <h2><span class="num">三</span>详细工作流程</h2>
+
+        <!-- Step 1 -->
+        <div class="step-card">
+            <div class="step-header blue">
+                <div class="step-title">第1步：开机与登录，绑定医疗机构</div>
+                <div class="step-badge">诊所工作人员</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>MWCT开机：</strong>按下MWCT电源键，设备启动自动进入医废界面，显示医废专用标识；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>手动登录：</strong>诊所工作人员在MWCT登录界面手动输入账号和密码，点击登录按钮；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>绑定机构：</strong>系统验证账号密码后，自动绑定该账号对应的医疗机构身份（机构名称、地址、联系方式等），进入主操作界面。</p>
+                </div>
+                <div class="step-note">账号与医疗机构一一对应，登录即完成机构身份确认。账号密码由晋卫通后台统一管理。</div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+            <div class="step-header blue">
+                <div class="step-title">第2步：扫描预下发二维码，自动识别废物类型并绑定</div>
+                <div class="step-badge">诊所工作人员</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>二维码预置：</strong>晋卫通后台预先向各诊所下发医废类型二维码标签，六大类废物（感染性、损伤性、药物性、化学性、病理性、可回收医废类）分别对应不同二维码；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>贴码：</strong>诊所工作人员将对应类型的二维码贴在打包封口的医废袋上；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>扫描识别：</strong>用MWCT内置扫码模块扫描该二维码 → 系统根据二维码内容自动识别废物类型 → MWCT屏幕显示识别结果（废物类别名称）；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>确认类型：</strong>工作人员核对屏幕上显示的废物类型，确认无误后进入称重环节。</p>
+                </div>
+                <div class="step-note">通过预下发二维码替代手动选择，减少误操作，确保废物分类准确。六类废物可使用不同颜色/形状的二维码标签进行区分。</div>
+                <div class="step-image">
+                    <img src="C:\Users\yins8\.trae-cn\work\6a2fe9daad0368c8466a2eaf\二维码示例.jpg" alt="医废类型二维码标签" />
+                    <div class="image-caption">医废类型二维码标签示意图（从左至右：感染性废物、损伤性废物、病理性废物、化学性废物、药物性废物）</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+            <div class="step-header blue">
+                <div class="step-title">第3步：称重</div>
+                <div class="step-badge">诊所工作人员</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>放置医废：</strong>将贴好二维码标签的医废袋放置于MWCT秤体挂钩上；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>自动称重：</strong>MWCT内置称重传感器自动采集重量数据，屏幕实时显示当前重量；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>重量稳定判定：</strong>系统自动判定重量读数稳定后锁定数据，MWCT屏幕显示最终重量值。</p>
+                </div>
+                <div class="step-note">MWCT自带称重模块。</div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+            <div class="step-header blue">
+                <div class="step-title">第4步：确认绑定并上报晋卫通后台</div>
+                <div class="step-badge">诊所工作人员</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>信息汇总：</strong>系统自动汇总本次全部数据：医疗机构名称、二维码废物类型、重量、上报时间等，在MWCT屏幕上展示供工作人员核对；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>确认提交：</strong>工作人员核对无误后，点击"确认提交"按钮；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>实时上报：</strong>MWCT通过4G网络将数据实时上传至晋卫通后台系统；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet"></div>
+                    <p><strong>上传反馈：</strong>MWCT屏幕显示"数据上报成功"，该条医废记录在晋卫通系统中形成电子台账，诊所端操作流程结束。</p>
+                </div>
+                <div class="step-note">称重数据与二维码类型信息自动绑定，无需额外操作。</div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step-card">
+            <div class="step-header dark">
+                <div class="step-title">第5步：晋卫通后台接收提报，自动规划收运路线</div>
+                <div class="step-badge">后台系统</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--dark)"></div>
+                    <p><strong>接收提报：</strong>晋卫通后台处置中心接收到诊所的上报数据后，在系统内生成待收运任务；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--dark)"></div>
+                    <p><strong>路线规划：</strong>医废系统根据各诊所的提报数据、地理位置、交通状况等信息，自动规划最优收运路线；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--dark)"></div>
+                    <p><strong>任务派发：</strong>系统将收运任务派发给对应收运司机，司机在手持机上接收任务确认，按规划路线出发前往各诊所收运。</p>
+                </div>
+                <div class="step-note">此步骤由晋卫通后台系统自动完成，MWCT端无需任何操作。</div>
+            </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step-card">
+            <div class="step-header green">
+                <div class="step-title">第6步：司机手持机到场，双方交接确认</div>
+                <div class="step-badge">收运司机</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--green-text)"></div>
+                    <p><strong>到场：</strong>司机携带手持终端按规划路线到达诊所现场；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--green-text)"></div>
+                    <p><strong>刷新位置：</strong>司机在手持机上刷新当前位置，系统自动获取当前GPS坐标和时间戳；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--green-text)"></div>
+                    <p><strong>交接确认：</strong>诊所工作人员与司机分别在手持机上进行交接确认操作 → 系统自动记录交接时间戳和电子公章戳（系统自动加盖的时间标记和签章标记），完成产生单位与处置单位的正式交接。</p>
+                </div>
+                <div class="step-note">交接操作在司机手持机上进行，不使用MWCT挂秤。时间戳和公章戳由晋卫通系统自动生成。</div>
+            </div>
+        </div>
+
+        <!-- Step 7 -->
+        <div class="step-card">
+            <div class="step-header green">
+                <div class="step-title">第7步：司机手持机RFID周转箱绑定，完成收运</div>
+                <div class="step-badge">收运司机</div>
+            </div>
+            <div class="step-body">
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--green-text)"></div>
+                    <p><strong>RFID绑定：</strong>因诊所产生量较少，收运时使用带有RFID标签的周转箱 → 司机用手持机扫描周转箱RFID标签 → 将诊所的医废袋与周转箱进行RFID绑定；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--green-text)"></div>
+                    <p><strong>确认收运：</strong>绑定完成后，司机在手持机上确认收运，系统记录收运时间、周转箱编号等信息；</p>
+                </div>
+                <div class="step-item">
+                    <div class="bullet" style="background: var(--green-text)"></div>
+                    <p><strong>流程闭环：</strong>医废转运至处置中心集中无害化处理，全流程数据在晋卫通系统中形成完整闭环。</p>
+                </div>
+                <div class="step-note">RFID周转箱绑定操作由司机使用手持机完成，MWCT挂秤不参与此环节。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 四、角色分工表 -->
+    <div class="section">
+        <h2><span class="num">四</span>各环节操作主体说明</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>步骤</th>
+                    <th>操作主体</th>
+                    <th>使用设备</th>
+                    <th>主要操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>第1步～第4步</td>
+                    <td>诊所工作人员</td>
+                    <td>MWCT（自带称重+扫码）</td>
+                    <td>登录绑定、扫码识别类型、称重、上报</td>
+                </tr>
+                <tr>
+                    <td>第5步</td>
+                    <td>晋卫通后台系统</td>
+                    <td>服务器/云平台</td>
+                    <td>接收提报、规划路线、派发任务</td>
+                </tr>
+                <tr>
+                    <td>第6步～第7步</td>
+                    <td>收运司机</td>
+                    <td>手持终端</td>
+                    <td>到场交接确认、RFID绑定收运</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    
+    <div class="page-footer">
+        智能挂秤医废收集终端（MWCT）详细工作流程 &nbsp;|&nbsp; V3.0
+    </div>
+</div>
+
+</body>
+</html>
